@@ -1,5 +1,7 @@
 BuildingEscape/.vs/
-BuildingEscape/Content/StarterContent/
+BuildingEscape/Content/StarterContent/Textures
+BuildingEscape/Content/StarterContent/HDRI
 BuildingEscape/Intermediate/
 BuildingEscape/Saved/
 BuildingEscape/Binaries/
+*.suo
