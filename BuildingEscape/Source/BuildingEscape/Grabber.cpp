@@ -15,7 +15,6 @@ UGrabber::UGrabber()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
 }
 
 
@@ -23,10 +22,71 @@ UGrabber::UGrabber()
 void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
+	GetPhysicsComponent();
+	GetInputComponent();
 
-	UE_LOG(LogTemp, Warning, TEXT("Grabber ready to grab!"));
+}
 
-	
+/**Gets Physics Handler*/
+void UGrabber::GetPhysicsComponent()
+{
+	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+
+}
+
+/**Gets Input component and binds actions*/
+void UGrabber::GetInputComponent()
+{
+	Input = GetOwner()->FindComponentByClass<UInputComponent>();
+
+	if (Input) {
+		Input->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+		Input->BindAction("Grab", IE_Released, this, &UGrabber::Release);
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Boy this course is shit"));
+	}
+}
+
+
+void UGrabber::Grab()
+{
+	GetFirstPhysicsBodyInReach();
+}
+
+
+void UGrabber::Release()
+{
+	UE_LOG(LogTemp, Warning, TEXT("We not grabbing :("));
+
+}
+
+FHitResult UGrabber::GetFirstPhysicsBodyInReach()
+{
+	FVector OUT_PlayerViewPointLocation;
+	FRotator OUT_PlayerViewPointRotation;
+
+	FVector LineTraceEnd = (OUT_PlayerViewPointRotation.Vector() * Reach) + OUT_PlayerViewPointLocation;
+	/*Careful, the below statment produces out values*/
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT_PlayerViewPointLocation, OUT_PlayerViewPointRotation);
+	FHitResult LineTraceHit;
+
+	FCollisionQueryParams QueryParams(FName(TEXT("")), false, GetOwner());
+
+	//ray cast out to reach distance (to what???)
+	bool bHasHitActor = GetWorld()->LineTraceSingleByObjectType(
+		LineTraceHit, OUT_PlayerViewPointLocation,
+		LineTraceEnd, FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
+		QueryParams
+	);
+
+	if (bHasHitActor) {
+		FString ActorHit = LineTraceHit.GetActor()->GetName();
+		UE_LOG(LogTemp, Warning, TEXT("Colliding with %s"), *ActorHit);
+
+	}
+
+	return FHitResult();
 }
 
 
@@ -35,20 +95,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// get playe viewport this tick (why????)
-	//ray cast out to reach distance (to what???)
-
-	FVector PlayerViewPointLocation;
-	FRotator PlayerViewPointRotation;
-
-    GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(PlayerViewPointLocation, PlayerViewPointRotation); 
-
-	//UE_LOG(LogTemp, Warning, TEXT("Location is %s, Position is %s"), *PlayerViewPointLocation.ToString(), *PlayerViewPointRotation.ToString());
-
-
-
-	FVector LineTraceEnd = (PlayerViewPointRotation.Vector() * Reach) + PlayerViewPointLocation;
-
-	DrawDebugLine(GetWorld(), PlayerViewPointLocation, LineTraceEnd, FColor(255, 0, 0), false, 0, 0, 10.f);	//see what ray caster hits
+	//if physics attached
+		//move object with us
 }
 
