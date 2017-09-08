@@ -25,16 +25,32 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
+	// How far ahead of the player can we reach in cm
 	float Reach = 100.f;
 
-	UPhysicsHandleComponent* PhysicsHandle = nullptr; 
-	UInputComponent* Input = nullptr;
+	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 
-	//Ray-Cast and grab what's in reach
+	UInputComponent* InputComponent = nullptr;
+	 
+	// Ray-cast and grab what's in reach
 	void Grab();
-	//realeases whatever currenty holding
+
+	// Called when grab is released
 	void Release();
-	void GetPhysicsComponent();
-	void GetInputComponent();
-	FHitResult GetFirstPhysicsBodyInReach();
+
+	// Find (assumed) attached phyics handle
+	void FindPhysicsHandleComponent();
+
+	// Setup (assumed) attached input component
+	void SetupInputComponent();
+
+	// Return hit for first physics body in reach
+	const FHitResult GetFirstPhysicsBodyInReach();
+
+	const FVector GetLineTraceEnd();
+
+	/**OUT values: These are initialized and the current values and then later passed by referce to methods that will modifiy them */
+	FVector OUT_PlayerViewPointLocation = FVector(0.f, 0.f, 0.f);
+
+	FRotator OUT_PlayerViewPointRotation = FRotator(0.f, 0.f, 0.f);
 };

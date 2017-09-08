@@ -38,12 +38,11 @@ private:
 	UPROPERTY(EditAnywhere)
 		float DoorCloseDeply = 0.55f; 
 
-	UPROPERTY(EditAnywhere)
-		AActor* ActorThatOpens;
-
 	float LastDoorOpenTime;
 	
 	AActor* Owner; 
 	
 	float CurrentTime; 
+
+	float GetTotalMassOfActorsOnPressurePlate();
 };
